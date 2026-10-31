@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recthex — Public Community Hub</title>
+    <style>
+        :root {
+            --primary-blue: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-hover: #1d4ed8;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding-bottom: 30px;
+        }
+
+        header {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .post-card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: none;
+            font-size: 14px;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .feed-heading {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-blue);
+        }
+
+        .discussion-card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .user-badge {
+            font-weight: 600;
+            color: var(--primary-blue);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .post-body {
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .reply-btn { color: var(--accent-blue); }
+        .report-btn { color: #d97706; }
+        .delete-btn { color: var(--danger-red); }
+
+        /* Replies Section */
+        .comments-container {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .comment-item {
+            font-size: 12.5px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .comment-user {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-right: 6px;
+        }
+
+        .reply-input-box {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .reply-input-box input {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .reply-input-box button {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Custom Delete Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 10px;
+            background: #e2e8f0;
+            color: var(--text-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 10px;
+            background: var(--danger-red);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-link">←</a>
+        <div class="header-title">
+            <h1>Recthex Public Community</h1>
+            <p>FUTA Student Housing Forum & Interactive Chat</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="post-card">
+            <textarea id="forumInput" placeholder="Start a public discussion or ask a question..."></textarea>
+            <button class="submit-btn" id="submitBtn" onclick="submitForumPost()">Post Message</button>
+        </div>
+
+        <h2 class="feed-heading">Public Discussions</h2>
+        <div id="forumFeed">Loading community feed...</div>
+    </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="color:var(--primary-blue); font-size:18px;">Delete Post?</h3>
+            <p style="color:var(--text-muted); font-size:13px;">Are you sure you want to delete this post?</p>
+            <div class="modal-actions">
+                <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-confirm">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            doc,
+            deleteDoc,
+            updateDoc,
+            arrayUnion,
+            onSnapshot,
+            query,
+            orderBy,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+        const firebaseConfig = {
+    apiKey: "AIzaSyBUCDC1N9StMF81Ur831JLpgI4xfG-H4mU",
+    authDomain: "recthex-new1.firebaseapp.com",
+    projectId: "recthex-new1",
+    storageBucket: "recthex-new1.firebasestorage.app",
+    messagingSenderId: "184930734727",
+    appId: "1:184930734727:web:f2b58d546d3504c8785e22",
+    measurementId: "G-FX8QGN9MKJ"
+};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let postToDeleteId = null;
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        window.submitForumPost = async function() {
+            const inputField = document.getElementById('forumInput');
+            const postText = inputField.value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!postText) return alert("Please write something before posting!");
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Publishing...";
+
+            try {
+                const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : "Anonymous_Student";
+                await addDoc(collection(db, "community_posts"), {
+                    user: "👤 " + userName,
+                    text: postText,
+                    createdAt: serverTimestamp(),
+                    userId: currentUser ? currentUser.uid : null,
+                    replies: []
+                });
+                inputField.value = "";
+            } catch (error) {
+                alert("Failed to share post: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Post Message";
+            }
+        };
+
+        window.sendReply = async function(postId) {
+            const replyInput = document.getElementById(`reply-input-${postId}`);
+            const replyText = replyInput.value.trim();
+
+            if (!replyText) return;
+
+            const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : "Student";
+            
+            try {
+                const postRef = doc(db, "community_posts", postId);
+                await updateDoc(postRef, {
+                    replies: arrayUnion({
+                        user: userName,
+                        text: replyText,
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    })
+                });
+                replyInput.value = "";
+            } catch (error) {
+                alert("Failed to post reply: " + error.message);
+            }
+        };
+
+        window.deletePost = function(postId) {
+            postToDeleteId = postId;
+            document.getElementById('deleteModal').style.display = 'flex';
+        };
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            postToDeleteId = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!postToDeleteId) return;
+            const btn = document.getElementById('confirmDeleteBtn');
+            btn.disabled = true;
+            btn.textContent = 'Deleting...';
+
+            try {
+                await deleteDoc(doc(db, "community_posts", postToDeleteId));
+                document.getElementById('deleteModal').style.display = 'none';
+            } catch (error) {
+                alert("Failed to delete post: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Yes, Delete';
+                postToDeleteId = null;
+            }
+        });
+
+        function buildPostCard(id, data) {
+            const user = escapeHtml(data.user || "👤 Anonymous_Student");
+            const text = escapeHtml(data.text || "");
+            let timeFormatted = "Just now";
+
+            if (data.createdAt && data.createdAt.toDate) {
+                const date = data.createdAt.toDate();
+                timeFormatted = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ", " + date.toLocaleDateString();
+            }
+
+            const isOwner = currentUser && data.userId === currentUser.uid;
+            const deleteBtn = isOwner ? `<button class="action-btn delete-btn" onclick="deletePost('${id}')">🗑️ Delete</button>` : '';
+
+            // Render comments/replies list
+            const repliesList = data.replies || [];
+            let repliesHTML = repliesList.map(r => `
+                <div class="comment-item">
+                    <span class="comment-user">${escapeHtml(r.user)}:</span>
+                    <span>${escapeHtml(r.text)}</span>
+                    <span style="float:right; font-size:10px; color:#94a3b8;">${r.timestamp || ''}</span>
+                </div>
+            `).join('');
+
+            const card = document.createElement('div');
+            card.className = 'discussion-card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="user-badge">${user}</span>
+                    <span class="timestamp">${timeFormatted}</span>
+                </div>
+                <div class="post-body">${text}</div>
+                <div class="card-actions">
+                    <button class="action-btn report-btn" onclick="alert('Post reported.')">⚠️ Report</button>
+                    ${deleteBtn}
+                </div>
+                <div class="comments-container">
+                    <div id="replies-list-${id}">${repliesHTML}</div>
+                    <div class="reply-input-box">
+                        <input type="text" id="reply-input-${id}" placeholder="Write a reply..." onkeypress="if(event.key==='Enter') sendReply('${id}')">
+                        <button onclick="sendReply('${id}')">Reply</button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        const feedGrid = document.getElementById('forumFeed');
+        const postsQuery = query(collection(db, "community_posts"), orderBy("createdAt", "desc"));
+
+        onSnapshot(postsQuery, (snapshot) => {
+            feedGrid.innerHTML = '';
+            if (snapshot.empty) {
+                feedGrid.innerHTML = '<div style="text-align:center; color:#64748b; padding:20px;">No public messages yet. Start the conversation!</div>';
+                return;
+            }
+            snapshot.docs.forEach((docSnap) => {
+                feedGrid.appendChild(buildPostCard(docSnap.id, docSnap.data()));
+            });
+        }, (error) => {
+            console.error("Firestore feed error:", error);
+            feedGrid.innerHTML = '<div style="text-align:center; color:#ef4444; padding:20px;">Unable to load public messages right now.</div>';
+        });
+    </script>
+</body>
+</html>
