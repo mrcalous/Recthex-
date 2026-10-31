@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recthex - FUTA Student Accommodation</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+body { background:#f7f9fc; color:#333; padding-bottom:30px; }
+header { background:#0a3d62; color:white; padding:20px 15px; text-align:center; border-bottom-left-radius:20px; border-bottom-right-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+header h1 { font-size:26px; letter-spacing:1px; }
+header p { font-size:13px; opacity:0.9; margin-top:5px; }
+#errorBanner { display:none; background:#fee2e2; color:#991b1b; padding:10px 14px; font-size:13px; word-break:break-word; }
+.post-property-wrap { padding:10px 15px 0; text-align:center; }
+.post-property-btn { display:inline-block; padding:10px 20px; background:#22c55e; color:white; text-decoration:none; border-radius:8px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+.search-container { padding:15px; }
+.search-box { width:100%; padding:12px; border:2px solid #cbd5e1; border-radius:8px; font-size:1rem; margin-bottom:10px; }
+.filter-scroll { display:flex; gap:8px; overflow-x:auto; padding:5px 0; white-space:nowrap; }
+.filter-badge { background:white; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600; border:1px solid #0a3d62; color:#0a3d62; cursor:pointer; }
+.filter-badge.active { background:#0a3d62; color:white; }
+.filter-badge.forum-badge { background:#0f172a; color:white; border-color:#0f172a; }
+.section-title { padding:10px 15px 5px; font-size:18px; color:#0a3d62; }
+.listings-grid { padding:15px; display:flex; flex-direction:column; gap:20px; }
+.card { background:white; border-radius:15px; overflow:hidden; box-shadow:0 4px 8px rgba(0,0,0,0.05); border:1px solid #eef2f5; }
+.card-image { width:100%; height:180px; object-fit:cover; display:block; }
+.card-image-container { width:100%; height:180px; background:#cbd5e1; display:flex; align-items:center; justify-content:center; }
+.card-image-placeholder-text { color:#64748b; font-weight:bold; }
+.status-badge { position:absolute; top:10px; right:10px; background:#10b981; color:white; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:bold; }
+.status-badge.occupied { background:#ef4444; }
+.card-content { padding:15px; }
+.price-tag { font-size:20px; font-weight:bold; color:#10b981; margin-bottom:5px; }
+.property-title { font-size:16px; font-weight:bold; margin-bottom:5px; color:#1e293b; }
+.location-info { font-size:13px; color:#747d8c; margin-bottom:15px; }
+.btn-contact { width:100%; background:#0a3d62; color:white; border:none; padding:12px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; }
+.empty-state { text-align:center; padding:30px 15px; color:#64748b; font-size:14px; }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; display:flex; justify-content:space-around; padding:10px 0; box-shadow:0 -2px 10px rgba(0,0,0,0.1); z-index:1000; }
+.nav-item { text-align:center; cursor:pointer; }
+.nav-icon { font-size:1.4rem; display:block; }
+.nav-label { font-size:0.75rem; }
+.nav-spacer { height:70px; width:100%; }
+
+.assistant-fab { position:fixed; bottom:85px; right:18px; width:56px; height:56px; border-radius:50%; background:#0a3d62; color:white; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 12px rgba(0,0,0,0.25); cursor:pointer; z-index:1100; border:none; }
+.assistant-panel { position:fixed; bottom:150px; right:18px; left:18px; max-height:65vh; background:white; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.2); display:none; flex-direction:column; z-index:1100; overflow:hidden; }
+.assistant-panel.open { display:flex; }
+.assistant-header { background:#0a3d62; color:white; padding:12px 15px; font-weight:bold; display:flex; justify-content:space-between; align-items:center; }
+.assistant-close { cursor:pointer; font-size:20px; }
+.assistant-body { padding:14px; overflow-y:auto; flex:1; }
+.assistant-msg { background:#f1f5f9; padding:10px 12px; border-radius:10px; margin-bottom:10px; font-size:14px; color:#1e293b; line-height:1.5; white-space:pre-wrap; }
+.assistant-user-msg { background:#dbeafe; margin-left:30px; }
+.assistant-error { background:#fee2e2; color:#991b1b; }
+.assistant-options { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.assistant-option-btn { background:white; border:1px solid #0a3d62; color:#0a3d62; padding:10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; text-align:left; }
+.assistant-input-row { display:flex; gap:8px; margin-bottom:10px; }
+.assistant-input-row input { flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; min-width:0; }
+.assistant-input-row button { background:#2ed573; color:white; border:none; padding:0 16px; border-radius:8px; font-weight:bold; cursor:pointer; }
+.assistant-footer { padding:10px 14px; border-top:1px solid #eef2f5; }
+.assistant-footer .assistant-input-row { margin-bottom:0; }
+.assistant-result-card { border:1px solid #eef2f5; border-radius:10px; padding:10px; margin-bottom:8px; cursor:pointer; font-size:13px; }
+.assistant-typing { font-style:italic; color:#94a3b8; font-size:13px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<header>
+    <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo" style="width:56px;height:56px;border-radius:14px;margin-bottom:8px;">
+    <h1>Recthex</h1>
+    <p>Easy Off-Campus Accommodation for FUTA Students</p>
+</header>
+
+<div id="errorBanner"></div>
+
+<div class="post-property-wrap">
+    <a href="add-property.html" class="post-property-btn">+ Post a Property</a>
+</div>
+
+<div id="authStatusBar" style="text-align:center;font-size:13px;color:#64748b;margin-top:10px;"></div>
+
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-box" placeholder="Search locations (e.g., West Gate, Orita Obele, South Gate)...">
+    <div class="filter-scroll">
+        <span class="filter-badge active" data-type="all">All Rooms</span>
+        <span class="filter-badge" data-type="self-contain">Self-Contain</span>
+        <span class="filter-badge" data-type="single room">Single Room</span>
+        <span class="filter-badge forum-badge" id="forumBadge">💬 Community Forum</span>
+    </div>
+</div>
+
+<h2 class="section-title">Available Accommodations</h2>
+<div class="listings-grid" id="listingsGrid">
+    <div class="empty-state">Loading listings…</div>
+</div>
+
+<div class="nav-spacer"></div>
+
+<div class="bottom-nav">
+    <div class="nav-item" onclick="window.location.href='index.html'"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+    <div class="nav-item" onclick="window.location.href='community.html'"><span class="nav-icon">💬</span><span class="nav-label">Forum</span></div>
+    <div class="nav-item" onclick="window.location.href='add-property.html'"><span class="nav-icon">➕</span><span class="nav-label">Add</span></div>
+</div>
+
+<button class="assistant-fab" id="assistantFab" aria-label="Open Recthex Assistant">🤖</button>
+
+<div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-header">
+        <span>Recthex Assistant</span>
+        <span class="assistant-close" id="assistantClose">✕</span>
+    </div>
+    <div class="assistant-body" id="assistantBody"></div>
+    <div class="assistant-footer">
+        <div class="assistant-input-row">
+            <input type="text" id="assistantFreeText" placeholder="Ask me anything..." autocomplete="off">
+            <button id="assistantFreeTextSend">Send</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const AI_MODEL_NAME = "gemini-3.8-flash";
+const $ = (id) => document.getElementById(id);
+
+function showError(msg) {
+    const b = $('errorBanner');
+    b.style.display = 'block';
+    b.textContent = 'Error: ' + msg;
+}
+window.addEventListener('error', (e) => showError(e.message));
+window.addEventListener('unhandledrejection', (e) => showError(e.reason && e.reason.message ? e.reason.message : e.reason));
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str ?? '');
+    return div.innerHTML;
+}
+function normalize(s) {
+    return String(s || '').toLowerCase().replace(/[\s\-]+/g, '');
+}
+
+/* FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyBUCDC1N9StMF81Ur831JLpgI4xfG-H4mU",
+  authDomain: "recthex-new1.firebaseapp.com",
+  projectId: "recthex-new1",
+  storageBucket: "recthex-new1.firebasestorage.app",
+  messagingSenderId: "184930734727",
+  appId: "1:184930734727:web:f2b58d546d3504c8785e22",
+  measurementId: "G-FX8QGN9MKJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentSingleTabManager({}) })
+});
+const auth = getAuth(app);
+
+/* AUTH STATUS */
+onAuthStateChanged(auth, (user) => {
+    const bar = $('authStatusBar');
+    if (user) {
+        bar.innerHTML = 'Logged in as <strong>' + escapeHtml(user.email) + '</strong> | ' +
+            '<a href="my-listings.html" style="color:#0a3d62;font-weight:bold;">My Listings</a> | ' +
+            '<a href="#" id="logoutLink" style="color:#ef4444;font-weight:bold;">Log Out</a>';
+        $('logoutLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try { await signOut(auth); } catch (err) { showError(err.message); }
+        });
+    } else {
+        bar.innerHTML = '<a href="login.html" style="color:#0a3d62;font-weight:bold;">Log In / Sign Up</a>';
+    }
+});
+
+/* LISTINGS */
+let allListings = [];
+let currentBadge = 'all';
+
+function applyFilters() {
+    const searchText = normalize($('searchInput').value);
+    const badge = normalize(currentBadge);
+    const cards = document.getElementsByClassName('card');
+    for (let i = 0; i < cards.length; i++) {
+        const loc = cards[i].dataset.location || '';
+        const title = cards[i].dataset.title || '';
+        const type = cards[i].dataset.type || '';
+        const okSearch = !searchText || loc.includes(searchText) || title.includes(searchText);
+        const okBadge = badge === 'all' || type.includes(badge) || title.includes(badge);
+        cards[i].style.display = (okSearch && okBadge) ? '' : 'none';
+    }
+}
+
+$('searchInput').addEventListener('input', applyFilters);
+$('forumBadge').addEventListener('click', () => { window.location.href = 'community.html'; });
+document.querySelectorAll('.filter-badge[data-type]').forEach((el) => {
+    el.addEventListener('click', () => {
+        currentBadge = el.dataset.type;
+        document.querySelectorAll('.filter-badge').forEach((b) => b.classList.remove('active'));
+        el.classList.add('active');
+        applyFilters();
+    });
+});
+
+function buildCard(house, docId) {
+    const safeTitle = escapeHtml(house.title || 'Untitled listing');
+    const safeGate = escapeHtml(house.gateLocation || 'Location not set');
+    const isOccupied = house.status === 'occupied';
+    const price = Number(house.price) || 0;
+    const hasPhoto = Array.isArray(house.images) && house.images.length > 0;
+    const detailUrl = 'property-detail.html?id=' + encodeURIComponent(docId);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+  card.dataset.id = docId;
+    card.dataset.type = normalize(house.type);
+    card.dataset.title = normalize(house.title);
+    card.dataset.location = normalize(house.gateLocation);
+
+    const imageHtml = hasPhoto
+        ? '<img class="card-image" src="' + escapeHtml(house.images[0]) + '" alt="' + safeTitle + '">'
+        : '<div class="card-image-container"><span class="card-image-placeholder-text">🏠 Photo Coming Soon</span></div>';
+
+    card.innerHTML =
+        '<div style="position:relative;">' + imageHtml +
+        '<span class="status-badge ' + (isOccupied ? 'occupied' : '') + '">' + (isOccupied ? 'Occupied' : 'Available') + '</span></div>' +
+        '<div class="card-content">' +
+        '<div class="price-tag">₦' + price.toLocaleString() + ' / year</div>' +
+        '<div class="property-title">' + safeTitle + '</div>' +
+        '<div class="location-info">📍 ' + safeGate + '</div>' +
+        '<button class="btn-contact">📞 Call Agent / Landlord</button></div>';
+
+    card.querySelector('.btn-contact').addEventListener('click', () => { window.location.href = detailUrl; });
+    return card;
+}
+
+function renderListings(docs) {
+    allListings = docs.map((d) => ({ id: d.id, ...d.data() }));
+    const grid = $('listingsGrid');
+    grid.innerHTML = '';
+    if (docs.length === 0) {
+        grid.innerHTML = '<div class="empty-state">No listings yet. Be the first to <a href="add-property.html">post a property</a>!</div>';
+        return;
+    }
+    docs.forEach((d) => grid.appendChild(buildCard(d.data(), d.id)));
+    applyFilters();
+}
+
+let hasReceivedData = false;
+setTimeout(() => {
+    if (!hasReceivedData) {
+        $('listingsGrid').innerHTML =
+            '<div class="empty-state">This is taking longer than usual — your connection may be slow. ' +
+            '<a href="#" onclick="window.location.reload();return false;" style="color:#0a3d62;font-weight:bold;">Tap to retry</a></div>';
+    }
+}, 10000);
+
+onSnapshot(
+    query(collection(db, "properties"), orderBy("createdAt", "desc")),
+    (snap) => { hasReceivedData = true; renderListings(snap.docs); },
+    (err) => {
+        showError(err.message);
+        $('listingsGrid').innerHTML = '<div class="empty-state">Couldn\'t load listings right now. Please check your connection and try again.</div>';
+    }
+);
+
+/* AI MODEL (loaded only when needed) */
+let model = null;
+async function getModel() {
+    if (model) return model;
+    const m = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-ai.js");
+    const ai = m.getAI(app, { backend: new m.GoogleAIBackend() });
+    model = m.getGenerativeModel(ai, { model: AI_MODEL_NAME });
+    return model;
+}
+
+/* ASSISTANT UI */
+const fab = $('assistantFab');
+const panel = $('assistantPanel');
+const bodyEl = $('assistantBody');
+const freeText = $('assistantFreeText');
+let assistantState = { budget: null, gate: 'any' };
+let busy = false;
+
+function scrollDown() { bodyEl.scrollTop = bodyEl.scrollHeight; }
+
+function addMsg(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'assistant-msg ' + (cls || '');
+    div.textContent = text;
+    bodyEl.appendChild(div);
+    scrollDown();
+    return div;
+}
+
+function addOptions(options) {
+    const wrap = document.createElement('div');
+    wrap.className = 'assistant-options';
+    options.forEach((o) => {
+        const b = document.createElement('button');
+        b.className = 'assistant-option-btn';
+        b.textContent = o.label;
+        b.addEventListener('click', o.action);
+        wrap.appendChild(b);
+    });
+    bodyEl.appendChild(wrap);
+    scrollDown();
+}
+
+function menuButton() {
+    addOptions([{ label: '⬅ Back to menu', action: showMenu }]);
+}
+
+function showMenu() {
+    bodyEl.innerHTML = '';
+    assistantState = { budget: null, gate: 'any' };
+    addMsg('Hi 👋 I am Recthex Assistant.\n\nI can help you find accommodation or answer general questions.');
+    addOptions([
+        { label: '🔍 Help me find a room', action: startFind },
+        { label: '🏠 What do Self-Contain / Single Room mean?', action: faqTypes },
+        { label: '📞 How do I contact a landlord?', action: faqContact },
+        { label: '➕ How do I post a property?', action: faqPost },
+        { label: '💡 Ask me anything', action: () => { addMsg('Sure 👍 Type your question in the box below.'); freeText.focus(); } }
+    ]);
+}
+
+function faqTypes() {
+    addMsg('Self-Contain: a room or small unit with its own bathroom and usually a kitchenette.\n\nSingle Room: one room where facilities such as the bathroom may be shared.\n\nFlat: a full apartment with several rooms and its own facilities.');
+    menuButton();
+}
+function faqContact() {
+    addMsg('Open a listing to reach its detail page, then tap Call Agent or WhatsApp to contact the landlord or agent directly.');
+    menuButton();
+}
+function faqPost() {
+    addMsg('Tap "+ Post a Property" on the home page. Log in or sign up, then enter the details, price, location and photos and submit.');
+    menuButton();
+}
+
+function startFind() {
+    addMsg("What's your yearly budget in ₦?");
+    const row = document.createElement('div');
+    row.className = 'assistant-input-row';
+    row.innerHTML = '<input type="number" id="assistantBudgetInput" placeholder="e.g. 150000"><button id="assistantBudgetGo">Go</button>';
+    bodyEl.appendChild(row);
+    scrollDown();
+    $('assistantBudgetGo').addEventListener('click', () => {
+        const val = Number($('assistantBudgetInput').value);
+        assistantState.budget = val > 0 ? val : null;
+        showGateStep();
+    });
+}
+
+function showGateStep() {
+    addMsg('Which area do you prefer?');
+    addOptions([
+        { label: 'Any area', action: () => { assistantState.gate = 'any'; showResults(); } },
+        { label: 'West Gate', action: () => { assistantState.gate = 'west'; showResults(); } },
+        { label: 'South Gate', action: () => { assistantState.gate = 'south'; showResults(); } },
+        { label: 'North Gate', action: () => { assistantState.gate = 'north'; showResults(); } }
+    ]);
+}
+
+function showResults() {
+    const { budget, gate } = assistantState;
+    let matches = allListings.filter((h) => h.status !== 'occupied');
+    if (budget) matches = matches.filter((h) => Number(h.price) <= budget * 1.15);
+    if (gate && gate !== 'any') matches = matches.filter((h) => (h.gateLocation || '').toLowerCase().includes(gate));
+    matches.sort((a, b) => Number(a.price) - Number(b.price));
+    matches = matches.slice(0, 5);
+
+    if (matches.length === 0) {
+        addMsg('No matching listings right now. Try another budget or area, or check again when new properties are posted.');
+        menuButton();
+        return;
+    }
+    addMsg('I found ' + matches.length + ' matching listing(s):');
+    matches.forEach((h) => appendResultCard(h));
+    menuButton();
+}
+
+function appendResultCard(h) {
+    const card = document.createElement('div');
+    card.className = 'assistant-result-card';
+    card.innerHTML = '<strong>' + escapeHtml(h.title || 'Untitled') + '</strong><br>₦' +
+        (Number(h.price) || 0).toLocaleString() + ' / year — ' + escapeHtml(h.gateLocation || '') +
+        '<br><a href="property-detail.html?id=' + encodeURIComponent(h.id) + '" style="color:#0a3d62;font-weight:bold;">View details →</a>';
+    card.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') return;
+        panel.classList.remove('open');
+        currentBadge = 'all';
+        $('searchInput').value = '';
+        document.querySelectorAll('.filter-badge').forEach((b) => b.classList.remove('active'));
+        const first = document.querySelector('.filter-badge[data-type="all"]');
+        if (first) first.classList.add('active');
+        applyFilters();
+        const target = document.querySelector('.card[data-id="' + h.id + '"]');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.style.outline = '3px solid #22c55e';
+            setTimeout(() => { target.style.outline = ''; }, 3000);
+        }
+    });
+    bodyEl.appe
