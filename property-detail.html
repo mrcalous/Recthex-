@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details - Recthex</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding-bottom: 80px;
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .gallery-container {
+            width: 100%;
+            position: relative;
+        }
+        .status-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background-color: #10b981;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .verified-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background-color: #2563eb;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .content {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        .location {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            margin-top: 24px;
+            border-left: 4px solid #2563eb;
+            padding-left: 8px;
+        }
+        .info-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            border-collapse: collapse;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .info-table tr { border-bottom: 1px solid #f1f5f9; }
+        .info-table tr:last-child { border-bottom: none; }
+        .info-table td { padding: 12px 16px; font-size: 0.95rem; }
+        .info-label { color: #64748b; font-weight: 500; width: 45%; }
+        .info-value { color: #1e293b; font-weight: 600; text-align: right; }
+        .report-box {
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+            text-align: center;
+        }
+        .report-btn {
+            background: none;
+            border: none;
+            color: #dc2626;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 6px;
+            font-size: 0.9rem;
+        }
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 12px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-call { background-color: #0f172a; color: white; }
+        .btn-whatsapp { background-color: #22c55e; color: white; }
+        .btn.disabled { opacity: 0.5; pointer-events: none; }
+        .error-box {
+            display: none;
+            margin: 16px 0;
+            padding: 12px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button class="back-btn" onclick="window.history.back()">⬅</button>
+        <span class="header-title">Property Details</span>
+    </div>
+
+    <div class="gallery-container">
+        <span class="verified-badge">✓ Recthex Verified</span>
+        <span class="status-badge" id="availabilityBadge">🟢 Available</span>
+        <div style="width: 100%; height: 260px; background: #cbd5e1; position: relative;">
+            <img id="mainGalleryImage" alt="Property photo" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+            <div id="galleryCounter" style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px;">1 / 1</div>
+        </div>
+        <div id="thumbnailContainer" style="display: flex; gap: 8px; padding: 10px; overflow-x: auto; background: #fff;"></div>
+    </div>
+<div id="videoBox" style="display:none;padding:10px;background:#fff;">
+    <video id="propertyVideo" controls preload="none" playsinline style="width:100%;border-radius:10px;background:#000;"></video>
+</div>
+    <div class="content">
+        <div class="error-box" id="errorBox"></div>
+        <div class="price">Loading...</div>
+        <h1 class="title">Loading Title...</h1>
+        <div class="location">📍 Loading Location...</div>
+
+        <h2 class="section-title">Property Profile</h2>
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Property Type</td>
+                <td class="info-value">-</td>
+            </tr>
+            <tr>
+                <td class="info-label">Distance to FUTA</td>
+                <td class="info-value">Nearby Campus</td>
+            </tr>
+            <tr>
+                <td class="info-label">Electricity Supply</td>
+                <td class="info-value">Available</td>
+            </tr>
+            <tr>
+                <td class="info-label">Water Source</td>
+                <td class="info-value">Borehole</td>
+            </tr>
+            <tr>
+                <td class="info-label">Security Profile</td>
+                <td class="info-value">Gated</td>
+            </tr>
+        </table>
+
+        <div class="report-box">
+            <p style="font-size: 0.9rem; color: #7f1d1d; font-weight: 500;">Notice suspicious data or pricing details?</p>
+            <button class="report-btn" onclick="alert('Thank you. Admin team will review this listing.')">⚠️ Report This Listing</button>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <a href="#" class="btn btn-call disabled" id="callBtn">📞 Call Agent</a>
+        <a href="#" class="btn btn-whatsapp disabled" id="waBtn" target="_blank" rel="noopener">💬 WhatsApp</a>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBUCDC1N9StMF81Ur831JLpgI4xfG-H4mU",
+        authDomain: "recthex-new1.firebaseapp.com",
+        projectId: "recthex-new1",
+        storageBucket: "recthex-new1.firebasestorage.app",
+        messagingSenderId: "184930734727",
+        appId: "1:184930734727:web:f2b58d546d3504c8785e22",
+        measurementId: "G-FX8QGN9MKJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const mainImage = document.getElementById('mainGalleryImage');
+    const thumbnailContainer = document.getElementById('thumbnailContainer');
+    const galleryCounter = document.getElementById('galleryCounter');
+    const errorBox = document.getElementById('errorBox');
+    const callBtn = document.getElementById('callBtn');
+    const waBtn = document.getElementById('waBtn');
+    const propertyId = new URLSearchParams(window.location.search).get('id');
+
+    function showError(text) {
+        errorBox.textContent = text;
+        errorBox.style.display = 'block';
+        document.querySelector('.price').innerText = '';
+        document.querySelector('.title').innerText = 'Property not available';
+        document.querySelector('.location').innerText = '';
+        galleryCounter.style.display = 'none';
+    }
+
+    async function loadPropertyData() {
+        if (!propertyId) {
+            showError('No property was selected. Go back and tap a listing again.');
+            return;
+        }
+
+        try {
+            const docRef = doc(db, "properties", propertyId);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                showError('This listing could not be found. It may have been removed.');
+                return;
+            }
+
+            const data = docSnap.data();
+
+            document.querySelector('.price').innerText = `₦${Number(data.price || 0).toLocaleString()} / year`;
+            document.querySelector('.title').innerText = data.title || 'Untitled Property';
+            document.querySelector('.location').innerText = `📍 ${data.gateLocation || 'Location not specified'}`;
+
+            const typeCell = document.querySelector('.info-table tr:nth-child(1) .info-value');
+            if (typeCell) typeCell.innerText = data.type || 'N/A';
+
+            if (data.status && data.status !== 'available') {
+                const badge = document.getElementById('availabilityBadge');
+                badge.innerText = '🔴 Not Available';
+                badge.style.backgroundColor = '#ef4444';
+            }
+
+            if (data.phone) {
+                const cleanPhone = String(data.phone).replace(/[^0-9+]/g, '');
+                callBtn.href = `tel:${cleanPhone}`;
+                callBtn.classList.remove('disabled');
+
+                let waPhone = String(data.phone).replace(/\D/g, '');
+                if (waPhone.startsWith('0')) waPhone = '234' + waPhone.slice(1);
+                if (waPhone.startsWith('2340')) waPhone = '234' + waPhone.slice(4);
+const msg = encodeURIComponent(`Hello, I saw a vacancy on your app and I'm interested. Is it still available?`);                waBtn.href = `https://wa.me/${waPhone}?text=${msg}`;
+                waBtn.classList.remove('disabled');
+            }
+if (data.videoUrl) {
+    const player = document.getElementById('propertyVideo');
+  player.src = data.videoUrl.replace('/upload/', '/upload/q_auto:low,w_480,f_auto,vc_auto/');
+    player.poster = data.videoUrl
+        .replace('/upload/', '/upload/so_0,q_auto,w_720/')
+        .replace(/\.[a-zA-Z0-9]+$/, '.jpg');
+    document.getElementById('videoBox').style.display = 'block';
+  }
+            const images = data.images || [];
+            if (images.length > 0) {
+                mainImage.src = images[0];
+                mainImage.style.display = 'block';
+                galleryCounter.innerText = `1 / ${images.length}`;
+                thumbnailContainer.innerHTML = '';
+
+                images.forEach((url, index) => {
+                    const thumb = document.createElement('div');
+                    thumb.style.cssText = 'width: 50px; height: 50px; border-radius: 6px; overflow: hidden; cursor: pointer; flex-shrink: 0;';
+                    thumb.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+
+                    thumb.addEventListener('click', () => {
+                        mainImage.src = url;
+                        galleryCounter.innerText = `${index + 1} / ${images.length}`;
+                    });
+                    thumbnailContainer.appendChild(thumb);
+                });
+            } else {
+                galleryCounter.style.display = 'none';
+                thumbnailContainer.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Error loading property:", error);
+            showError('Could not load this property: ' + error.message);
+        }
+    }
+
+    loadPropertyData();
+</script>
+</body>
+</html>
