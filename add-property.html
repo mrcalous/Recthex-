@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recthex - Add Property</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f7f9fc; color: #333; padding: 20px 15px; }
+        .header-nav { display: flex; align-items: center; margin-bottom: 25px; gap: 15px; }
+        .back-link { color: #0a3d62; text-decoration: none; font-weight: bold; font-size: 16px; }
+        h1 { font-size: 22px; color: #0a3d62; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #4a5568; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; background-color: white; }
+        input:focus, select:focus { outline: none; border-color: #0a3d62; }
+        .btn-submit { width: 100%; background-color: #2ed573; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-submit:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        .form-message { margin: 12px 0; padding: 10px 12px; border-radius: 8px; font-size: 14px; display: none; word-break: break-word; }
+        .form-message.success { display: block; background-color: #dcfce7; color: #166534; }
+        .form-message.error { display: block; background-color: #fee2e2; color: #991b1b; }
+        .form-message.info { display: block; background-color: #e0f2fe; color: #075985; }
+        .photo-box { padding: 14px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; }
+        .photo-box p { margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .image-preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .preview-thumb { position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden; border: 1px solid #ccc; }
+        .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-thumb .remove-btn { position: absolute; top: 2px; right: 2px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="header-nav">
+        <a href="index.html" class="back-link">← Back</a>
+        <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo" style="width:28px; height:28px; border-radius:7px;">
+        <h1>List a New Property</h1>
+    </div>
+
+    <form id="propertyForm" novalidate>
+        <div class="form-group">
+            <label for="title">Property Title</label>
+            <input type="text" id="title" placeholder="e.g., Modern Self-Contain" maxlength="80">
+        </div>
+        <div class="form-group">
+            <label for="type">Accommodation Type</label>
+            <select id="type">
+                <option value="Self-Contain">Self-Contain</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Flat">Flat</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="location">Location / Gate Area</label>
+            <select id="location">
+                <option value="West Gate Area">West Gate</option>
+                <option value="South Gate Main Road">South Gate</option>
+                <option value="North Gate Area">North Gate</option>
+                <option value="Jibowu / Federal Housing">Jibowu</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="price">Rent Price (₦ per year)</label>
+            <input type="number" id="price" placeholder="e.g., 180000">
+        </div>
+        <div class="form-group">
+            <label for="phone">Landlord/Agent Call Line</label>
+            <input type="tel" id="phone" placeholder="e.g., 08012345678">
+        </div>
+
+        <div class="form-group">
+            <label>Property Photos (optional)</label>
+            <div class="photo-box">
+                <p>📸 Choose up to 5 photos (max 5MB each)</p>
+                <input type="file" id="propertyImages" accept="image/*" multiple>
+            </div>
+            <div class="image-preview-container" id="imagePreviewContainer"></div>
+        </div>
+<label style="margin-top:14px;">Short video (optional, max 16 MB)</label>
+<div class="photo-box">
+    <input type="file" id="propertyVideo" accept="video/*">
+</div>
+<div id="videoInfo" style="font-size:13px;color:#64748b;margin-top:6px;"></div>
+        <div class="form-message" id="formMessage"></div>
+        <button type="submit" class="btn-submit" id="submitBtn">Publish Listing</button>
+    </form>
+
+    <script type="module">
+        const formMessage = document.getElementById('formMessage');
+        function showMessage(text, type) {
+            formMessage.textContent = text;
+            formMessage.className = 'form-message ' + type;
+            formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        window.addEventListener('error', (e) => showMessage('Page error: ' + e.message, 'error'));
+        window.addEventListener('unhandledrejection', (e) => showMessage('Error: ' + (e.reason && e.reason.message ? e.reason.message : e.reason), 'error'));
+
+        const form = document.getElementById('propertyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('propertyImages');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        let selectedFiles = [];
+        let currentUser = null;
+        let db = null;
+        let fb = null;
+
+        const CLOUDINARY_CLOUD_NAME = "bcdrcy4g";
+        const CLOUDINARY_UPLOAD_PRESET = "recthex_upload";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUCDC1N9StMF81Ur831JLpgI4xfG-H4mU",
+            authDomain: "recthex-new1.firebaseapp.com",
+            projectId: "recthex-new1",
+            storageBucket: "recthex-new1.firebasestorage.app",
+            messagingSenderId: "184930734727",
+            appId: "1:184930734727:web:f2b58d546d3504c8785e22",
+            measurementId: "G-FX8QGN9MKJ"
+        };
+
+        try {
+            const appMod = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js");
+            const fsMod = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js");
+            const authMod = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js");
+            const app = appMod.initializeApp(firebaseConfig);
+            db = fsMod.getFirestore(app);
+            fb = fsMod;
+            const auth = authMod.getAuth(app);
+            authMod.onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = 'login.html?redirect=add-property.html';
+                    return;
+                }
+                currentUser = user;
+            });
+        } catch (err) {
+            showMessage('Could not connect to Firebase: ' + err.message, 'error');
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (selectedFiles.length + files.length > 5) {
+                showMessage('You can only upload a maximum of 5 photos.', 'error');
+                fileInput.value = '';
+                return;
+            }
+            files.forEach((file) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage(file.name + ' is too large. Max size is 5MB.', 'error');
+                    return;
+                }
+                selectedFiles.push(file);
+            });
+            renderPreviews();
+            fileInput.value = '';
+        });
+
+        function renderPreviews() {
+            previewContainer.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'preview-thumb';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'remove-btn';
+                    btn.textContent = '×';
+                    btn.addEventListener('click', () => {
+                        selectedFiles.splice(index, 1);
+                        renderPreviews();
+                    });
+                    div.appendChild(img);
+                    div.appendChild(btn);
+                    previewContainer.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+async function shrinkImage(file) {
+    try {
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, 1280 / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+        return blob || file;
+    } catch (e) {
+        return file;
+    }
+      }
+        async function uploadToCloudinary(file) {
+            const url = 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload';
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 60000);
+            try {
+                const response = await fetch(url, { method: 'POST', body: formData, signal: controller.signal });
+                if (!response.ok) {
+                    const body = await response.text();
+                    throw new Error('Photo upload failed: ' + body);
+                }
+                const data = await response.json();
+                return data.secure_url;
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    throw new Error('Photo upload took too long. Check your network or use a smaller photo.');
+                }
+                throw err;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+let selectedVideo = null;
+const videoInput = document.getElementById('propertyVideo');
+videoInput.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) { selectedVideo = null; return; }
+    if (f.size > 16 * 1024 * 1024) {
+        showMessage('Video is too big. Maximum is 16 MB.', 'error');
+        videoInput.value = '';
+        selectedVideo = null;
+        return;
+    }
+    selectedVideo = f;
+    document.getElementById('videoInfo').textContent = 'Video selected: ' + (f.size / 1024 / 1024).toFixed(1) + ' MB';
+});
+
+function uploadVideo(file) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/video/upload');
+        xhr.timeout = 180000;
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) showMessage('Uploading video… ' + Math.round((e.loaded / e.total) * 100) + '%', 'info');
+        };
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try { resolve(JSON.parse(xhr.responseText).secure_url); }
+                catch (err) { reject(new Error('Video upload gave a bad response.')); }
+            } else {
+                reject(new Error('Video upload failed: ' + xhr.responseText));
+            }
+        };
+        xhr.onerror = () => reject(new Error('Network problem during video upload. Try again.'));
+        xhr.ontimeout = () => reject(new Error('Video upload took too long. Try a shorter video.'));
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        xhr.send(fd);
+    });
+      }
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!db || !fb) {
+                showMessage('Not connected to Firebase yet. Refresh the page and try again.', 'error');
+                return;
+            }
+            if (!currentUser) {
+                showMessage('You are not logged in yet. Wait a moment or log in first.', 'error');
+                return;
+            }
+
+            const title = document.getElementById('title').value.trim();
+            const type = document.getElementById('type').value;
+            const gateLocation = document.getElementById('location').value;
+            const price = Number(document.getElementById('price').value);
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!title || !price || !phone) {
+                showMessage('Please fill in the title, price and phone number.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Publishing…';
+            showMessage('Publishing, please wait…', 'info');
+
+            try {
+                const imageUrls = [];
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    showMessage('Uploading photo ' + (i + 1) + ' of ' + selectedFiles.length + '…', 'info');
+                    imageUrls.push(await uploadToCloudinary(await shrinkImage(selectedFiles[i])));
+                }
+let videoUrl = '';
+if (selectedVideo) {
+    videoUrl = await uploadVideo(selectedVideo);
+}
+                showMessage('Saving your listing…', 'info');
+                await fb.addDoc(fb.collection(db, "properties"), {
+                    title: title,
+                    type: type,
+                    gateLocation: gateLocation,
+                    price: price,
+                    phone: phone,
+                    images: imageUrls,
+videoUrl: videoUrl,
+                    status: 'available',
+                    createdAt: fb.serverTimestamp(),
+                    ownerId: currentUser.uid
+                });
+
+                showMessage('Success! Your property has been listed.', 'success');
+                form.reset();
+                selectedFiles = [];
+                previewContainer.innerHTML = '';
+                setTimeout(() => { window.location.href = "index.html"; }, 1200);
+            } catch (error) {
+                console.error("Error adding property:", error);
+                showMessage('Error: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Publish Listing';
+            }
+        });
+    </script>
+</body>
+</html>
