@@ -401,4 +401,97 @@ function appendResultCard(h) {
             setTimeout(() => { target.style.outline = ''; }, 3000);
         }
     });
-    bodyEl.appe
+    bodyEl.appendChild(card);
+    scrollDown();
+}
+
+function listingsText() {
+    if (allListings.length === 0) return 'No listings available right now.';
+    return allListings.slice(0, 40).map((h) =>
+        '- id:' + h.id + ' | ' + (h.title || 'Untitled') + ' | NGN ' + (Number(h.price) || 0).toLocaleString() +
+        '/year | ' + (h.type || 'room') + ' | ' + (h.gateLocation || 'unknown') + ' | ' + (h.status === 'occupied' ? 'occupied' : 'available')
+    ).join('\n');
+}
+
+async function askGemini(userText) {
+    busy = true;
+    const typing = document.createElement('div');
+    typing.className = 'assistant-typing';
+    typing.textContent = '🤖 Recthex Assistant is thinking…';
+    bodyEl.appendChild(typing);
+    scrollDown();
+
+    const prompt =
+        'You are Recthex Assistant, a friendly helper on Recthex, an off-campus accommodation platform for FUTA students in Akure, Nigeria. ' +
+        'You can also answer general questions (school, tech, everyday topics) in simple language. Keep answers short and useful. ' +
+        'If asked about Recthex properties, use ONLY the listings below. Never invent properties, prices or contacts. ' +
+        'If you recommend listings, end your reply with one final line exactly like: IDS: id1,id2\n\n' +
+        'LISTINGS:\n' + listingsText() + '\n\nStudent question: ' + userText;
+
+    try {
+        const m = await getModel();
+        const result = await Promise.race([
+    m.generateContent(prompt),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('The AI is taking too long. Check your network and try again.')), 30000))
+]);
+
+        let ids = [];
+        const match = reply.match(/IDS:\s*([^\n]+)\s*$/i);
+        if (match) {
+            ids = match[1].split(',').map((s) => s.trim()).filter(Boolean);
+            reply = reply.replace(/IDS:\s*([^\n]+)\s*$/i, '').trim();
+        }
+        addMsg(reply);
+        ids.forEach((id) => {
+            const h = allListings.find((x) => x.id === id);
+            if (h) appendResultCard(h);
+        });
+    } catch (err) {
+        console.error("Gemini error:", err);
+        typing.remove();
+        addMsg('AI connection error.\n\n' + (err && err.message ? err.message : err), 'assistant-error');
+    }
+
+    menuButton();
+    busy = false;
+}
+
+function handleFreeText() {
+    const text = freeText.value.trim();
+    if (!text || busy) return;
+    freeText.value = '';
+    addMsg(text, 'assistant-user-msg');
+
+    const lower = text.toLowerCase();
+
+    if (/how.*post|upload.*propert|list.*propert|add.*propert/.test(lower)) return faqPost();
+    if (/how.*(contact|call|reach)|landlord.*(number|contact)|whatsapp/.test(lower)) return faqContact();
+    if (/(what|difference|mean).*(self.?contain|single room|flat)/.test(lower)) return faqTypes();
+
+    const numberMatch = lower.match(/(\d[\d,]{2,})/);
+    const budget = numberMatch ? Number(numberMatch[1].replace(/,/g, '')) : null;
+    let gate = 'any';
+    if (lower.includes('west')) gate = 'west';
+    else if (lower.includes('south')) gate = 'south';
+    else if (lower.includes('north')) gate = 'north';
+
+    if (budget && /room|house|find|accommodation|self|single|flat|gate|under|budget/.test(lower)) {
+        assistantState = { budget, gate };
+        return showResults();
+    }
+
+    askGemini(text);
+}
+
+fab.addEventListener('click', () => {
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open') && bodyEl.children.length === 0) showMenu();
+});
+$('assistantClose').addEventListener('click', () => panel.classList.remove('open'));
+$('assistantFreeTextSend').addEventListener('click', handleFreeText);
+freeText.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleFreeText(); }
+});
+</script>
+</body>
+</html>
