@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Property - Recthex</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding-bottom: 40px;
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #2563eb;
+        }
+        .btn-submit {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-delete {
+            width: 100%;
+            background-color: #ef4444;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button class="back-btn" onclick="window.history.back()">⬅</button>
+        <span class="header-title">Edit Listing</span>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <form id="editPropertyForm">
+                <div class="form-group">
+                    <label>Property Title</label>
+                    <input type="text" id="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (₦ / year)</label>
+                    <input type="number" id="price" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gate Location</label>
+                    <input type="text" id="gateLocation" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Property Type</label>
+                    <select id="type" required>
+                        <option value="Self Contain">Self Contain</option>
+                        <option value="Single Room">Single Room</option>
+                        <option value="1 Bedroom Flat">1 Bedroom Flat</option>
+                        <option value="2 Bedroom Flat">2 Bedroom Flat</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone / WhatsApp Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Save Changes</button>
+            </form>
+
+            <button type="button" class="btn-delete" id="deleteBtn">Delete Listing</button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBLz9aeY1nxdcniOplQHQpX2QZJRwppzds",
+        authDomain: "recthex-app-a1.firebaseapp.com",
+        projectId: "recthex-app-a1",
+        storageBucket: "recthex-app-a1.firebasestorage.app",
+        messagingSenderId: "941193667954",
+        appId: "1:941193667954:web:be265b8e5236e356eb29eb",
+        measurementId: "G-4K44Q7ZRBK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const propertyId = new URLSearchParams(window.location.search).get('id');
+    const form = document.getElementById('editPropertyForm');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    let currentOwnerId = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            alert("Please sign in to edit listings.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        if (!propertyId) {
+            alert("No property specified.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        try {
+            const docRef = doc(db, "properties", propertyId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                currentOwnerId = data.ownerId;
+
+                if (currentOwnerId !== user.uid) {
+                    alert("You do not have permission to edit this listing.");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('price').value = data.price || '';
+                document.getElementById('gateLocation').value = data.gateLocation || '';
+                document.getElementById('type').value = data.type || 'Self Contain';
+                document.getElementById('phone').value = data.phone || '';
+            } else {
+                alert("Property not found.");
+                window.location.href = "index.html";
+            }
+        } catch (error) {
+            console.error("Error fetching property:", error);
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const docRef = doc(db, "properties", propertyId);
+            await updateDoc(docRef, {
+                title: document.getElementById('title').value,
+                price: Number(document.getElementById('price').value),
+                gateLocation: document.getElementById('gateLocation').value,
+                type: document.getElementById('type').value,
+                phone: document.getElementById('phone').value
+            });
+            alert("Listing updated successfully!");
+            window.location.href = `property-detail.html?id=${propertyId}`;
+        } catch (error) {
+            console.error("Error updating document:", error);
+            alert("Failed to update listing.");
+        }
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+        if (confirm("Are you sure you want to delete this property listing?")) {
+            try {
+                await deleteDoc(doc(db, "properties", propertyId));
+                alert("Listing deleted.");
+                window.location.href = "index.html";
+            } catch (error) {
+                console.error("Error deleting document:", error);
+                alert("Failed to delete listing.");
+            }
+        }
+    });
+</script>
+</body>
+</html>
