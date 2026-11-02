@@ -265,13 +265,32 @@ onSnapshot(
 );
 
 /* AI MODEL (loaded only when needed) */
-let model = null;
-async function getModel() {
-    if (model) return model;
-    const m = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-ai.js");
-    const ai = m.getAI(app, { backend: new m.GoogleAIBackend() });
-    model = m.getGenerativeModel(ai, { model: AI_MODEL_NAME });
-    return model;
+let aiInstance = null;
+const modelCache = {};
+const MODEL_LIST = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite"];
+
+async function getModel(name) {
+    if (modelCache[name]) return modelCache[name];
+    const m2 = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-ai.js");
+    if (!aiInstance) aiInstance = m2.getAI(app, { backend: new m2.GoogleAIBackend() });
+    modelCache[name] = m2.getGenerativeModel(aiInstance, { model: name });
+    return modelCache[name];
+}
+
+async function generateWithFallback(prompt) {
+    let lastError;
+    for (const name of MODEL_LIST) {
+        try {
+            const mdl = await getModel(name);
+            return await Promise.race([
+                mdl.generateContent(prompt),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('The AI took too long to answer.')), 25000))
+            ]);
+        } catch (err) {
+            lastError = err;
+        }
+    }
+    throw lastError;
 }
 
 /* ASSISTANT UI */
@@ -429,12 +448,9 @@ async function askGemini(userText) {
         'LISTINGS:\n' + listingsText() + '\n\nStudent question: ' + userText;
 
     try {
-        const m = await getModel();
-        const result = await Promise.race([
-    m.generateContent(prompt),
-    new Promise((_, reject) => setTimeout(() => reject(new Error('The AI is taking too long. Check your network and try again.')), 30000))
-]);
-
+        const result = await generateWithFallback(prompt);
+      let reply = result.response.text();
+typing.remove();
         let ids = [];
         const match = reply.match(/IDS:\s*([^\n]+)\s*$/i);
         if (match) {
