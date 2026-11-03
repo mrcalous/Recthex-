@@ -58,10 +58,23 @@ header p { font-size:13px; opacity:0.9; margin-top:5px; }
 .assistant-footer .assistant-input-row { margin-bottom:0; }
 .assistant-result-card { border:1px solid #eef2f5; border-radius:10px; padding:10px; margin-bottom:8px; cursor:pointer; font-size:13px; }
 .assistant-typing { font-style:italic; color:#94a3b8; font-size:13px; margin-bottom:10px; }
+  #welcomeScreen { position:fixed; inset:0; z-index:5000; background:linear-gradient(160deg,#0a3d62,#1e6fa8); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 24px; transition:opacity .4s; }
+#welcomeScreen.hide { opacity:0; pointer-events:none; }
+#welcomeScreen img { width:84px; height:84px; border-radius:20px; margin-bottom:18px; }
+#welcomeScreen h1 { font-size:28px; margin-bottom:10px; }
+#welcomeScreen .sub { font-size:17px; font-weight:600; margin-bottom:14px; opacity:.95; }
+#welcomeScreen p.note { font-size:15px; line-height:1.6; max-width:340px; opacity:.9; margin-bottom:28px; }
+#welcomeScreen button { background:#22c55e; color:#fff; border:none; padding:14px 34px; border-radius:30px; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25); }
 </style>
 </head>
 <body>
-
+<div id="welcomeScreen">
+    <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo">
+    <h1>Welcome to Recthex</h1>
+    <div class="sub">Where your accommodation worries end.</div>
+    <p class="note">Whether you want to stay close to campus or in a quieter area, choose the place you love. We are here to make it easy for you.</p>
+    <button id="welcomeBtn">Find my room</button>
+</div>
 <header>
     <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo" style="width:56px;height:56px;border-radius:14px;margin-bottom:8px;">
     <h1>Recthex</h1>
@@ -465,9 +478,8 @@ typing.remove();
     } catch (err) {
         console.error("Gemini error:", err);
         typing.remove();
-        addMsg('AI connection error.\n\n' + (err && err.message ? err.message : err), 'assistant-error');
+        addMsg('The AI answers are temporarily unavailable. You can still use the buttons above to find a room.', 'assistant-error');
     }
-
     menuButton();
     busy = false;
 }
@@ -508,6 +520,39 @@ $('assistantFreeTextSend').addEventListener('click', handleFreeText);
 freeText.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); handleFreeText(); }
 });
+</script>
+  <script>
+(function () {
+    var screen = document.getElementById('welcomeScreen');
+    var btn = document.getElementById('welcomeBtn');
+    if (!screen) { return; }
+    if (!btn) { return; }
+
+    function hideScreen() {
+        screen.style.display = 'none';
+    }
+
+    function closeWelcome() {
+        screen.classList.add('hide');
+        setTimeout(hideScreen, 450);
+        try {
+            sessionStorage.setItem('recthexWelcome', '1');
+        } catch (e) {
+        }
+    }
+
+    var seen = false;
+    try {
+        seen = sessionStorage.getItem('recthexWelcome') === '1';
+    } catch (e) {
+    }
+
+    if (seen) {
+        hideScreen();
+    }
+
+    btn.addEventListener('click', closeWelcome);
+})();
 </script>
 </body>
 </html>
