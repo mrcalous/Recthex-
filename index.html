@@ -58,23 +58,92 @@ header p { font-size:13px; opacity:0.9; margin-top:5px; }
 .assistant-footer .assistant-input-row { margin-bottom:0; }
 .assistant-result-card { border:1px solid #eef2f5; border-radius:10px; padding:10px; margin-bottom:8px; cursor:pointer; font-size:13px; }
 .assistant-typing { font-style:italic; color:#94a3b8; font-size:13px; margin-bottom:10px; }
-  #welcomeScreen { position:fixed; inset:0; z-index:5000; background:linear-gradient(160deg,#0a3d62,#1e6fa8); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 24px; transition:opacity .4s; }
+#welcomeScreen { position:fixed; inset:0; z-index:5000; background:#0a3d62; color:#fff; overflow:hidden; transition:opacity .4s; }
 #welcomeScreen.hide { opacity:0; pointer-events:none; }
-#welcomeScreen img { width:84px; height:84px; border-radius:20px; margin-bottom:18px; }
-#welcomeScreen h1 { font-size:28px; margin-bottom:10px; }
-#welcomeScreen .sub { font-size:17px; font-weight:600; margin-bottom:14px; opacity:.95; }
-#welcomeScreen p.note { font-size:15px; line-height:1.6; max-width:340px; opacity:.9; margin-bottom:28px; }
-#welcomeScreen button { background:#22c55e; color:#fff; border:none; padding:14px 34px; border-radius:30px; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+#wsTrack { display:flex; height:100%; width:100%; transition:transform .45s ease; }
+.ws-slide { min-width:100%; height:100%; position:relative; background-color:#0a3d62; background-size:cover; background-position:center; display:flex; padding:28px 22px 120px; text-align:center; overflow-y:auto; }
+.ws-slide::before { content:""; position:fixed; inset:0; background:linear-gradient(180deg, rgba(10,61,98,.80), rgba(6,24,44,.94)); pointer-events:none; }
+.ws-inner { position:relative; max-width:360px; width:100%; margin:auto; }
+.ws-logo { width:84px; height:84px; border-radius:20px; margin-bottom:16px; }
+.ws-inner h2 { font-size:26px; margin-bottom:10px; }
+.ws-inner h3 { font-size:17px; font-weight:600; margin-bottom:14px; opacity:.95; }
+.ws-inner p { font-size:15px; line-height:1.6; opacity:.92; margin-bottom:12px; }
+.ws-row { display:flex; gap:12px; text-align:left; margin-bottom:11px; align-items:flex-start; }
+.ws-letter { min-width:34px; height:34px; border-radius:50%; background:#22c55e; color:#fff; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+.ws-row b { display:block; font-size:14px; }
+.ws-row span { font-size:12.5px; opacity:.9; line-height:1.4; }
+.ws-list { text-align:left; list-style:none; padding:0; }
+.ws-list li { font-size:15px; line-height:1.5; margin-bottom:12px; padding-left:26px; position:relative; }
+.ws-list li::before { content:"✓"; position:absolute; left:0; color:#22c55e; font-weight:bold; }
+.ws-btn { display:block; width:100%; border:none; border-radius:30px; padding:14px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:12px; }
+.ws-green { background:#22c55e; color:#fff; }
+.ws-light { background:#fff; color:#0a3d62; }
+#wsBar { position:absolute; left:0; right:0; bottom:0; padding:14px 20px 22px; display:flex; align-items:center; justify-content:space-between; z-index:2; }
+#wsDots { display:flex; gap:7px; }
+#wsDots span { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); }
+#wsDots span.on { background:#22c55e; width:22px; border-radius:6px; }
+#wsSkip { background:none; border:none; color:#fff; opacity:.8; font-size:14px; cursor:pointer; }
+#wsNext { background:#22c55e; color:#fff; border:none; padding:11px 26px; border-radius:24px; font-weight:bold; font-size:15px; cursor:pointer; }
 </style>
 </head>
 <body>
-<div id="welcomeScreen">
-    <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo">
-    <h1>Welcome to Recthex</h1>
-    <div class="sub">Where your accommodation worries end.</div>
-    <p class="note">Whether you want to stay close to campus or in a quieter area, choose the place you love. We are here to make it easy for you.</p>
-    <button id="welcomeBtn">Find my room</button>
-</div>
+  <div id="welcomeScreen">
+  <div id="wsTrack">
+
+    <div class="ws-slide"><div class="ws-inner">
+      <img class="ws-logo" src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo">
+      <h2>Welcome to Recthex</h2>
+      <h3>Beyond Properties. Beyond Possibilities.</h3>
+      <p>Easy off-campus accommodation for FUTA students.</p>
+    </div></div>
+
+    <div class="ws-slide"><div class="ws-inner">
+      <h2>What if...</h2>
+      <p>What if finding a property, accessing valuable information, connecting with the right people and discovering new opportunities could all happen in one place?</p>
+      <h3>That is the vision behind RECTHEX.</h3>
+    </div></div>
+
+    <div class="ws-slide"><div class="ws-inner">
+      <h2>What RECTHEX stands for</h2>
+      <div class="ws-row"><div class="ws-letter">R</div><div><b>Real Estate</b><span>Properties made easy to find and share.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">E</div><div><b>Education</b><span>Information that helps you decide well.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">C</div><div><b>Connection</b><span>Bringing people, businesses and opportunities together.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">T</div><div><b>Technology</b><span>Using innovation to make everyday activities easier.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">H</div><div><b>Housing</b><span>Making accommodation and housing solutions more accessible.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">E</div><div><b>Environment</b><span>Promoting better communities and sustainable surroundings.</span></div></div>
+      <div class="ws-row"><div class="ws-letter">X</div><div><b>X-factor</b><span>Representing uniqueness, limitless possibilities and innovation.</span></div></div>
+    </div></div>
+
+    <div class="ws-slide"><div class="ws-inner">
+      <h2>How Recthex helps you</h2>
+      <ul class="ws-list">
+        <li>Browse rooms with photos and video</li>
+        <li>Search by gate area and room type</li>
+        <li>Call or WhatsApp the landlord directly</li>
+        <li>Join the community forum to ask and share</li>
+        <li>Landlords can list a property in minutes</li>
+      </ul>
+    </div></div>
+
+    <div class="ws-slide"><div class="ws-inner">
+      <h2>One Platform.<br>Multiple Possibilities.<br>Endless Connections.</h2>
+      <p>RECTHEX - Connecting People, Properties and Opportunities.</p>
+    </div></div>
+
+    <div class="ws-slide"><div class="ws-inner">
+      <h2>Ready to begin?</h2>
+      <p>Your next home is waiting.</p>
+      <button class="ws-btn ws-green" id="wsFind">Find my room</button>
+      <button class="ws-btn ws-light" id="wsPost">Post a property</button>
+    </div></div>
+
+  </div>
+  <div id="wsBar">
+    <button id="wsSkip">Skip</button>
+    <div id="wsDots"></div>
+    <button id="wsNext">Next</button>
+  </div>
+  </div>
 <header>
     <img src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo" style="width:56px;height:56px;border-radius:14px;margin-bottom:8px;">
     <h1>Recthex</h1>
@@ -521,12 +590,36 @@ freeText.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); handleFreeText(); }
 });
 </script>
-  <script>
+<script>
 (function () {
     var screen = document.getElementById('welcomeScreen');
-    var btn = document.getElementById('welcomeBtn');
     if (!screen) { return; }
-    if (!btn) { return; }
+
+    var BG = [
+        // paste your 4 picture links here, each in quotes, with a comma after each one
+        // example: "https://res.cloudinary.com/bcdrcy4g/image/upload/xxxx.jpg",
+    ];
+
+    var track = document.getElementById('wsTrack');
+    var slides = track.querySelectorAll('.ws-slide');
+    var dotsBox = document.getElementById('wsDots');
+    var nextBtn = document.getElementById('wsNext');
+    var skipBtn = document.getElementById('wsSkip');
+    var index = 0;
+    var startX = 0;
+
+    function smallLink(url) {
+        return url.replace('/upload/', '/upload/w_900,q_auto,f_auto/');
+    }
+
+    for (var i = 0; i < slides.length; i++) {
+        if (BG.length > 0) {
+            var link = smallLink(BG[i % BG.length]);
+            slides[i].style.backgroundImage = 'url("' + link + '")';
+        }
+        var dot = document.createElement('span');
+        dotsBox.appendChild(dot);
+    }
 
     function hideScreen() {
         screen.style.display = 'none';
@@ -541,6 +634,28 @@ freeText.addEventListener('keydown', (e) => {
         }
     }
 
+    function show(n) {
+        if (n < 0) { n = 0; }
+        if (n > slides.length - 1) { n = slides.length - 1; }
+        index = n;
+        track.style.transform = 'translateX(-' + (index * 100) + '%)';
+        var dots = dotsBox.querySelectorAll('span');
+        for (var j = 0; j < dots.length; j++) {
+            if (j === index) {
+                dots[j].className = 'on';
+            } else {
+                dots[j].className = '';
+            }
+        }
+        if (index === slides.length - 1) {
+            nextBtn.style.visibility = 'hidden';
+            skipBtn.style.visibility = 'hidden';
+        } else {
+            nextBtn.style.visibility = 'visible';
+            skipBtn.style.visibility = 'visible';
+        }
+    }
+
     var seen = false;
     try {
         seen = sessionStorage.getItem('recthexWelcome') === '1';
@@ -549,9 +664,26 @@ freeText.addEventListener('keydown', (e) => {
 
     if (seen) {
         hideScreen();
+        return;
     }
 
-    btn.addEventListener('click', closeWelcome);
+    nextBtn.addEventListener('click', function () { show(index + 1); });
+    skipBtn.addEventListener('click', closeWelcome);
+    document.getElementById('wsFind').addEventListener('click', closeWelcome);
+    document.getElementById('wsPost').addEventListener('click', function () {
+        window.location.href = 'add-property.html';
+    });
+
+    screen.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+    });
+    screen.addEventListener('touchend', function (e) {
+        var diff = e.changedTouches[0].clientX - startX;
+        if (diff < -60) { show(index + 1); }
+        if (diff > 60) { show(index - 1); }
+    });
+
+    show(0);
 })();
 </script>
 </body>
