@@ -84,6 +84,8 @@ header p { font-size:13px; opacity:0.9; margin-top:5px; }
 #wsDots span.on { background:#22c55e; width:22px; border-radius:6px; }
 #wsSkip { background:none; border:none; color:#fff; opacity:.8; font-size:14px; cursor:pointer; }
 #wsNext { background:#22c55e; color:#fff; border:none; padding:11px 26px; border-radius:24px; font-weight:bold; font-size:15px; cursor:pointer; }
+.ws-inner { background:rgba(6,24,44,0.60); padding:20px 16px; border-radius:18px; }
+.ws-inner h2, .ws-inner h3, .ws-inner p, .ws-row b, .ws-row span, .ws-list li { text-shadow:0 1px 4px rgba(0,0,0,0.6); }
 </style>
 </head>
 <body>
@@ -596,9 +598,11 @@ freeText.addEventListener('keydown', (e) => {
     if (!screen) { return; }
 
     var BG = [
-        // paste your 4 picture links here, each in quotes, with a comma after each one
-        // example: "https://res.cloudinary.com/bcdrcy4g/image/upload/xxxx.jpg",
-    ];
+    "https://res.cloudinary.com/bcdrcy4g/image/upload/v1793797346/pexels-taiyesalawu-38040969.jpg",
+    "https://res.cloudinary.com/bcdrcy4g/image/upload/v1793797310/pexels-bashirhahmed-35686184.jpg",
+    "https://res.cloudinary.com/bcdrcy4g/image/upload/v1793797273/pexels-akoonie-36814806.jpg",
+    "https://res.cloudinary.com/bcdrcy4g/image/upload/v1793797243/pexels-yahaya-ahmed-326723906-34432716.jpg"
+];
 
     var track = document.getElementById('wsTrack');
     var slides = track.querySelectorAll('.ws-slide');
