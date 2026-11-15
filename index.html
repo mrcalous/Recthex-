@@ -85,18 +85,39 @@ header p { font-size:13px; opacity:0.9; margin-top:5px; }
 #wsNext { background:#22c55e; color:#fff; border:none; padding:11px 26px; border-radius:24px; font-weight:bold; font-size:15px; cursor:pointer; }
 .ws-inner { background:rgba(6,24,44,0.60); padding:20px 16px; border-radius:18px; }
 .ws-inner h2, .ws-inner h3, .ws-inner p, .ws-row b, .ws-row span, .ws-list li { text-shadow:0 1px 4px rgba(0,0,0,0.6); }
+.ws-inner.ws-hero .tag { color:#f5c26b; letter-spacing:2px; font-size:13px; font-weight:700; margin-bottom:14px; }
+.ws-inner.ws-hero h2 { font-family:Georgia,'Times New Roman',serif; font-size:32px; line-height:1.15; margin-bottom:12px; }
+.ws-inner.ws-hero h2 span { color:#f5c26b; }
+.ws-inner.ws-hero p { font-size:16px; }
+.ws-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0 18px; }
+.ws-chips span { border:1px solid rgba(255,255,255,.35); border-radius:20px; padding:6px 12px; font-size:13px; }
+.ws-btn-gold { background:linear-gradient(135deg,#f5c26b,#c98f3d); color:#1a1205; }
+.ws-btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); }
+.ws-logo { width:96px; height:96px; }
+.ws-inner.ws-hero .tag { color:#f5c26b; letter-spacing:2px; font-size:13px; font-weight:700; margin-bottom:14px; }
+.ws-inner.ws-hero h2 { font-family:Georgia,'Times New Roman',serif; font-size:32px; line-height:1.15; margin-bottom:12px; }
+.ws-inner.ws-hero h2 span { color:#f5c26b; }
+.ws-inner.ws-hero p { font-size:16px; }
+.ws-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0 18px; }
+.ws-chips span { border:1px solid rgba(255,255,255,.35); border-radius:20px; padding:6px 12px; font-size:13px; }
+.ws-btn-gold { background:linear-gradient(135deg,#f5c26b,#c98f3d); color:#1a1205; }
+.ws-btn-ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); }
+.ws-logo { width:96px; height:96px; }
 </style>
 </head>
 <body>
   <div id="welcomeScreen">
   <div id="wsTrack">
 
-    <div class="ws-slide"><div class="ws-inner">
-      <img class="ws-logo" src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo">
-      <h2>Welcome to Recthex</h2>
-      <h3>Beyond Properties. Beyond Possibilities.</h3>
-      <p>Easy off-campus accommodation for FUTA students.</p>
-    </div></div>
+    <div class="ws-slide"><div class="ws-inner ws-hero">
+  <img class="ws-logo" src="https://res.cloudinary.com/ozkhiygd/image/upload/v1789628303/file_00000000ef58821080c1b2874103b015.png" alt="Recthex logo">
+  <div class="tag">HELLO FUTA STUDENT ✨</div>
+  <h2>Welcome to Recthex<br><span>Find Your Home</span></h2>
+  <p>Beyond Properties. Beyond Possibilities.</p>
+  <div class="ws-chips"><span>Photos &amp; video</span><span>Call or WhatsApp</span><span>Student forum</span></div>
+  <button class="ws-btn ws-btn-gold" onclick="document.getElementById('wsNext').click()">Explore Recthex →</button>
+  <button class="ws-btn ws-btn-ghost" onclick="document.getElementById('wsSkip').click()">Skip to listings</button>
+</div></div>
 
     <div class="ws-slide"><div class="ws-inner">
       <h2>What if...</h2>
@@ -618,7 +639,7 @@ freeText.addEventListener('keydown', (e) => {
     for (var i = 0; i < slides.length; i++) {
         if (BG.length > 0) {
             var link = smallLink(BG[i % BG.length]);
-            slides[i].style.backgroundImage = 'url("' + link + '")';
+            slides[i].style.backgroundImage = 'linear-gradient(rgba(10,61,98,0.50), rgba(6,24,44,0.80)), url("' + link + '")';
         }
         var dot = document.createElement('span');
         dotsBox.appendChild(dot);
