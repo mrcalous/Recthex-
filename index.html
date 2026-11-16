@@ -573,6 +573,7 @@ typing.remove();
     } catch (err) {
         console.error("Gemini error:", err);
         typing.remove();
+      addMsg('DEBUG: ' + (err && err.message ? err.message : err));
         addMsg('The AI answers are temporarily unavailable. You can still use the buttons above to find a room.', 'assistant-error');
     }
     menuButton();
