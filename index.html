@@ -223,7 +223,7 @@ header p { font-size:13px; opacity:0.9; margin-top:5px; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-check.js";
 const AI_MODEL_NAME = "gemini-3.8-flash";
 const $ = (id) => document.getElementById(id);
 
@@ -256,6 +256,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+  initializeAppCheck(app, {
+  provider: new ReCaptchaEnterpriseProvider('6LdsYSIuAAAAAE0q4CbzMm4bQzYeskdJmVMx0WVR'),
+  isTokenAutoRefreshEnabled: true
+});
 const db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentSingleTabManager({}) })
 });
