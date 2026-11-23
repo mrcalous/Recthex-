@@ -240,7 +240,7 @@ function escapeHtml(str) {
     div.textContent = String(str ?? '');
     return div.innerHTML;
 }
-function normalize(s) {
+function normalize(s) {9
     return String(s || '').toLowerCase().replace(/[\s\-]+/g, '');
 }
 
@@ -256,10 +256,14 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-  initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider('6LdsYSIuAAAAAE0q4CbzMm4bQzYeskdJmVMx0WVR'),
-  isTokenAutoRefreshEnabled: true
-});
+  try {
+    initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider("6LfVOy0uAAAAAKam0ip2zbYWpq3DsBd1hOjZU0H1"),
+        isTokenAutoRefreshEnabled: true
+    });
+} catch (e) {
+    console.error("App Check error:", e);
+  }
 const db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentSingleTabManager({}) })
 });
